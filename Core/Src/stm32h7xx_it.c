@@ -55,7 +55,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-
+extern DMA_HandleTypeDef hdma_hrtim1_m;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -188,23 +188,33 @@ void SysTick_Handler(void)
 	uint32_t m_period_middle_ticks = hhrtim.Instance->sMasterRegs.MPER / 2;
 	static volatile uint32_t count = 0;
 
+	static uint32_t dma_buffr[2] = {100, 200};
+
 	if(uwTick % 100 == 0)
 	{
+		// TIMER_A should NOT be updated
 //		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP1xR =  m_period_middle_ticks - count;
 //		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP2xR =  m_period_middle_ticks + count;
 
 		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP1xR =  m_period_middle_ticks - count;
 		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP2xR =  m_period_middle_ticks + count;
 
-		//
-		//            hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP1xR =  m_period_middle_ticks - count;
-		//            hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP2xR =  m_period_middle_ticks + count;
+		// TIMER_C should be updated over DMA
 
 		count++;
-		if( count > 100 )
+		if( count > 200 )
 		{
 			count = 0;
 		}
+	}
+
+	if(uwTick % 500 == 0)
+	{
+		// TIMER_C should be updated over DMA
+		HAL_HRTIM_BurstDMATransfer( &hhrtim, HRTIM_TIMERINDEX_MASTER, (uint32_t)dma_buffr, 1 );
+		uint32_t tmp = dma_buffr[0];
+		dma_buffr[0] = dma_buffr[1];
+		dma_buffr[1] = tmp;
 	}
 
 
@@ -224,6 +234,20 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles DMA1 stream0 global interrupt.
+  */
+void DMA1_Stream0_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
+
+  /* USER CODE END DMA1_Stream0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_hrtim1_m);
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream0_IRQn 1 */
+}
 
 /* USER CODE BEGIN 1 */
 

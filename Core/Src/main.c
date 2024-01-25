@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "stm32h7xx_ll_cortex.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -91,6 +92,7 @@ int main(void)
   MX_HRTIM_Init();
   /* USER CODE BEGIN 2 */
 
+
   HAL_HRTIM_SoftwareReset( &hhrtim, HRTIM_TIMERRESET_MASTER ); // MASTER should reset its slaves
 
   HAL_HRTIM_WaveformCountStart( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C );
@@ -100,6 +102,9 @@ int main(void)
                                  HRTIM_OUTPUT_TA1 | HRTIM_OUTPUT_TA2 |
                                  HRTIM_OUTPUT_TB1 | HRTIM_OUTPUT_TB2 |
                                  HRTIM_OUTPUT_TC1 | HRTIM_OUTPUT_TC2  );
+
+  LL_SYSTICK_EnableIT();
+
 
 
   /* USER CODE END 2 */
@@ -358,6 +363,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
 

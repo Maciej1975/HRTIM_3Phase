@@ -42,6 +42,7 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 
+extern HRTIM_HandleTypeDef hhrtim;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

@@ -184,6 +184,29 @@ void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
+	// cyclic update the PWM
+	uint32_t m_period_middle_ticks = hhrtim.Instance->sMasterRegs.MPER / 2;
+	static volatile uint32_t count = 0;
+
+
+	hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP1xR =  m_period_middle_ticks - count;
+	hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP2xR =  m_period_middle_ticks + count;
+
+	//            hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP1xR =  m_period_middle_ticks - count;
+	//            hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP2xR =  m_period_middle_ticks + count;
+	//
+	//            hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP1xR =  m_period_middle_ticks - count;
+	//            hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP2xR =  m_period_middle_ticks + count;
+
+	count++;
+	if( count > 100 )
+	{
+		count = 0;
+	}
+
+
+
+
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */

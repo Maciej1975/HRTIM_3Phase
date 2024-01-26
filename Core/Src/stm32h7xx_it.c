@@ -192,12 +192,17 @@ void SysTick_Handler(void)
 
 	if(uwTick % 100 == 0)
 	{
-		// TIMER_A should NOT be updated
-//		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP1xR =  m_period_middle_ticks - count;
-//		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP2xR =  m_period_middle_ticks + count;
+		// TIMER_A is updated directly at the moment, because it works! - ref for oscilloscope
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP1xR =  m_period_middle_ticks - count - 200;
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP2xR =  m_period_middle_ticks + count + 200;
 
+		// TIMER_x should NOT be updated directly
 		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP1xR =  m_period_middle_ticks - count;
 		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP2xR =  m_period_middle_ticks + count;
+
+		// TIMER_x should NOT be updated directly
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP1xR =  m_period_middle_ticks - count;
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP2xR =  m_period_middle_ticks + count;
 
 		// TIMER_C should be updated over DMA
 

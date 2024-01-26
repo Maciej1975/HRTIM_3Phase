@@ -99,7 +99,7 @@ int main(void)
   HAL_HRTIM_SoftwareReset( &hhrtim, HRTIM_TIMERRESET_MASTER ); // MASTER should reset its slaves
 
   HAL_HRTIM_WaveformCountStart( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C );
-  HAL_HRTIM_WaveformCountStart( &hhrtim, HRTIM_TIMERID_MASTER );
+  HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_MASTER );
 
   HAL_HRTIM_WaveformOutputStart( &hhrtim,
                                  HRTIM_OUTPUT_TA1 | HRTIM_OUTPUT_TA2 |
@@ -213,7 +213,7 @@ static void MX_HRTIM_Init(void)
   {
     Error_Handler();
   }
-  pTimeBaseCfg.Period = 0x1770;
+  pTimeBaseCfg.Period = 6000;
   pTimeBaseCfg.RepetitionCounter = 0x00;
   pTimeBaseCfg.PrescalerRatio = HRTIM_PRESCALERRATIO_DIV1;
   pTimeBaseCfg.Mode = HRTIM_MODE_CONTINUOUS;
@@ -247,7 +247,6 @@ static void MX_HRTIM_Init(void)
   {
     Error_Handler();
   }
-  pTimeBaseCfg.Period = 6000;
   pTimeBaseCfg.Mode = HRTIM_MODE_SINGLESHOT_RETRIGGERABLE;
   if (HAL_HRTIM_TimeBaseConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_A, &pTimeBaseCfg) != HAL_OK)
   {
@@ -255,6 +254,7 @@ static void MX_HRTIM_Init(void)
   }
   pTimerCfg.InterruptRequests = HRTIM_TIM_IT_NONE;
   pTimerCfg.DMARequests = HRTIM_TIM_DMA_NONE;
+  pTimerCfg.PreloadEnable = HRTIM_PRELOAD_DISABLED;
   pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_INDEPENDENT;
   pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_DISABLED;
   pTimerCfg.PushPull = HRTIM_TIMPUSHPULLMODE_DISABLED;

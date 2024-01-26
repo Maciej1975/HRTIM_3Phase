@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
+extern DMA_HandleTypeDef hdma_hrtim1_m;
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
@@ -104,6 +105,26 @@ void HAL_HRTIM_MspInit(HRTIM_HandleTypeDef* hhrtim)
 
     /* Peripheral clock enable */
     __HAL_RCC_HRTIM1_CLK_ENABLE();
+
+    /* HRTIM1 DMA Init */
+    /* HRTIM1_M Init */
+    hdma_hrtim1_m.Instance = DMA1_Stream0;
+    hdma_hrtim1_m.Init.Request = DMA_REQUEST_HRTIM_MASTER;
+    hdma_hrtim1_m.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_hrtim1_m.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_hrtim1_m.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_hrtim1_m.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_hrtim1_m.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_hrtim1_m.Init.Mode = DMA_NORMAL;
+    hdma_hrtim1_m.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_hrtim1_m.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_hrtim1_m) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hhrtim,hdmaMaster,hdma_hrtim1_m);
+
   /* USER CODE BEGIN HRTIM1_MspInit 1 */
 
   /* USER CODE END HRTIM1_MspInit 1 */
@@ -165,6 +186,9 @@ void HAL_HRTIM_MspDeInit(HRTIM_HandleTypeDef* hhrtim)
   /* USER CODE END HRTIM1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_HRTIM1_CLK_DISABLE();
+
+    /* HRTIM1 DMA DeInit */
+    HAL_DMA_DeInit(hhrtim->hdmaMaster);
   /* USER CODE BEGIN HRTIM1_MspDeInit 1 */
 
   /* USER CODE END HRTIM1_MspDeInit 1 */

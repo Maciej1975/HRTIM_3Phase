@@ -255,7 +255,6 @@ static void MX_HRTIM_Init(void)
   }
   pTimerCfg.InterruptRequests = HRTIM_TIM_IT_NONE;
   pTimerCfg.DMARequests = HRTIM_TIM_DMA_NONE;
-  pTimerCfg.PreloadEnable = HRTIM_PRELOAD_DISABLED;
   pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_INDEPENDENT;
   pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_DISABLED;
   pTimerCfg.PushPull = HRTIM_TIMPUSHPULLMODE_DISABLED;
@@ -263,7 +262,7 @@ static void MX_HRTIM_Init(void)
   pTimerCfg.FaultLock = HRTIM_TIMFAULTLOCK_READWRITE;
   pTimerCfg.DeadTimeInsertion = HRTIM_TIMDEADTIMEINSERTION_DISABLED;
   pTimerCfg.DelayedProtectionMode = HRTIM_TIMER_A_B_C_DELAYEDPROTECTION_DISABLED;
-  pTimerCfg.UpdateTrigger = HRTIM_TIMUPDATETRIGGER_NONE;
+  pTimerCfg.UpdateTrigger = HRTIM_TIMUPDATETRIGGER_MASTER;
   pTimerCfg.ResetTrigger = HRTIM_TIMRESETTRIGGER_MASTER_PER;
   pTimerCfg.ResetUpdate = HRTIM_TIMUPDATEONRESET_DISABLED;
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_A, &pTimerCfg) != HAL_OK)
@@ -274,9 +273,6 @@ static void MX_HRTIM_Init(void)
   {
     Error_Handler();
   }
-  pTimerCfg.PreloadEnable = HRTIM_PRELOAD_ENABLED;
-  pTimerCfg.UpdateTrigger = HRTIM_TIMUPDATETRIGGER_MASTER;
-  pTimerCfg.ResetUpdate = HRTIM_TIMUPDATEONRESET_ENABLED;
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_C, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();

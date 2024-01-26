@@ -216,7 +216,8 @@ void SysTick_Handler(void)
 	if(uwTick % 500 == 0)
 	{
 		// TIMER_C should be updated over DMA
-		HAL_HRTIM_BurstDMATransfer( &hhrtim, HRTIM_TIMERINDEX_MASTER, (uint32_t)dma_buffr, 1 );
+		HAL_StatusTypeDef volatile ret =
+				HAL_HRTIM_BurstDMATransfer( &hhrtim, HRTIM_TIMERINDEX_MASTER, (uint32_t)dma_buffr, 1 );
 		uint32_t tmp = dma_buffr[0];
 		dma_buffr[0] = dma_buffr[1];
 		dma_buffr[1] = tmp;
@@ -241,17 +242,32 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles DMA1 stream0 global interrupt.
+  * @brief This function handles DMA1 stream2 global interrupt.
   */
-void DMA1_Stream0_IRQHandler(void)
+void DMA1_Stream2_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
+  /* USER CODE BEGIN DMA1_Stream2_IRQn 0 */
 
-  /* USER CODE END DMA1_Stream0_IRQn 0 */
+  /* USER CODE END DMA1_Stream2_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_hrtim1_m);
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
+  /* USER CODE BEGIN DMA1_Stream2_IRQn 1 */
 
-  /* USER CODE END DMA1_Stream0_IRQn 1 */
+  /* USER CODE END DMA1_Stream2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMAMUX1 overrun interrupt.
+  */
+void DMAMUX1_OVR_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 0 */
+
+  /* USER CODE END DMAMUX1_OVR_IRQn 0 */
+  // Handle DMA1_Stream2
+  HAL_DMAEx_MUX_IRQHandler(&hdma_hrtim1_m);
+  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 1 */
+
+  /* USER CODE END DMAMUX1_OVR_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

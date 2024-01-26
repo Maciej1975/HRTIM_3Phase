@@ -87,6 +87,7 @@ void HAL_MspInit(void)
 */
 void HAL_HRTIM_MspInit(HRTIM_HandleTypeDef* hhrtim)
 {
+  HAL_DMA_MuxSyncConfigTypeDef pSyncConfig;
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(hhrtim->Instance==HRTIM1)
   {
@@ -108,7 +109,7 @@ void HAL_HRTIM_MspInit(HRTIM_HandleTypeDef* hhrtim)
 
     /* HRTIM1 DMA Init */
     /* HRTIM1_M Init */
-    hdma_hrtim1_m.Instance = DMA1_Stream0;
+    hdma_hrtim1_m.Instance = DMA1_Stream2;
     hdma_hrtim1_m.Init.Request = DMA_REQUEST_HRTIM_MASTER;
     hdma_hrtim1_m.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_hrtim1_m.Init.PeriphInc = DMA_PINC_DISABLE;
@@ -119,6 +120,16 @@ void HAL_HRTIM_MspInit(HRTIM_HandleTypeDef* hhrtim)
     hdma_hrtim1_m.Init.Priority = DMA_PRIORITY_HIGH;
     hdma_hrtim1_m.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_hrtim1_m) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    pSyncConfig.SyncSignalID = HAL_DMAMUX1_SYNC_EXTI0;
+    pSyncConfig.SyncPolarity = HAL_DMAMUX_SYNC_NO_EVENT;
+    pSyncConfig.SyncEnable = DISABLE;
+    pSyncConfig.EventEnable = ENABLE;
+    pSyncConfig.RequestNumber = 1;
+    if (HAL_DMAEx_ConfigMuxSync(&hdma_hrtim1_m, &pSyncConfig) != HAL_OK)
     {
       Error_Handler();
     }

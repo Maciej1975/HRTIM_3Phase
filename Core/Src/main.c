@@ -96,15 +96,18 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  HAL_HRTIM_SoftwareReset( &hhrtim, HRTIM_TIMERRESET_MASTER ); // MASTER should reset its slaves
+  HAL_StatusTypeDef volatile ret =
+  				HAL_HRTIM_SoftwareReset( &hhrtim, HRTIM_TIMERRESET_MASTER ); // MASTER should reset its slaves
 
-  HAL_HRTIM_WaveformCountStart( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C );
-  HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_MASTER );
-
-  HAL_HRTIM_WaveformOutputStart( &hhrtim,
+  ret = HAL_HRTIM_WaveformOutputStart( &hhrtim,
                                  HRTIM_OUTPUT_TA1 | HRTIM_OUTPUT_TA2 |
                                  HRTIM_OUTPUT_TB1 | HRTIM_OUTPUT_TB2 |
                                  HRTIM_OUTPUT_TC1 | HRTIM_OUTPUT_TC2  );
+
+  ret = HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C | HRTIM_TIMERID_MASTER );
+  //HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_MASTER );
+
+
 
   LL_SYSTICK_EnableIT();
 
@@ -222,7 +225,7 @@ static void MX_HRTIM_Init(void)
     Error_Handler();
   }
   pTimerCfg.InterruptRequests = HRTIM_MASTER_IT_NONE;
-  pTimerCfg.DMARequests = HRTIM_MASTER_DMA_MREP;
+  pTimerCfg.DMARequests = HRTIM_MASTER_DMA_MCMP1;
   pTimerCfg.DMASrcAddress = 0x0000;
   pTimerCfg.DMADstAddress = 0x0000;
   pTimerCfg.DMASize = 0x1;
@@ -231,9 +234,9 @@ static void MX_HRTIM_Init(void)
   pTimerCfg.ResetOnSync = HRTIM_SYNCRESET_DISABLED;
   pTimerCfg.DACSynchro = HRTIM_DACSYNC_NONE;
   pTimerCfg.PreloadEnable = HRTIM_PRELOAD_ENABLED;
-  pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_DMABURST_UPDATE;
+  pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_DMABURST;
   pTimerCfg.BurstMode = HRTIM_TIMERBURSTMODE_MAINTAINCLOCK;
-  pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_ENABLED;
+  pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_DISABLED;
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_MASTER, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
@@ -256,7 +259,6 @@ static void MX_HRTIM_Init(void)
   pTimerCfg.DMARequests = HRTIM_TIM_DMA_NONE;
   pTimerCfg.PreloadEnable = HRTIM_PRELOAD_DISABLED;
   pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_INDEPENDENT;
-  pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_DISABLED;
   pTimerCfg.PushPull = HRTIM_TIMPUSHPULLMODE_DISABLED;
   pTimerCfg.FaultEnable = HRTIM_TIMFAULTENABLE_NONE;
   pTimerCfg.FaultLock = HRTIM_TIMFAULTLOCK_READWRITE;
@@ -269,6 +271,7 @@ static void MX_HRTIM_Init(void)
   {
     Error_Handler();
   }
+  pTimerCfg.PreloadEnable = HRTIM_PRELOAD_ENABLED;
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_B, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
@@ -368,9 +371,12 @@ static void MX_DMA_Init(void)
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
-  /* DMA1_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+  /* DMA1_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+  /* DMAMUX1_OVR_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMAMUX1_OVR_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMAMUX1_OVR_IRQn);
 
 }
 

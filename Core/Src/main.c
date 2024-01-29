@@ -97,16 +97,27 @@ int main(void)
 
 
   HAL_StatusTypeDef volatile ret =
-  				HAL_HRTIM_SoftwareReset( &hhrtim, HRTIM_TIMERRESET_MASTER ); // MASTER should reset its slaves
+		  HAL_HRTIM_SoftwareReset( &hhrtim, HRTIM_TIMERRESET_MASTER ); // MASTER should reset its slaves
+  if( ret != HAL_OK)
+  {
+	  Error_Handler();
+  }
 
   ret = HAL_HRTIM_WaveformOutputStart( &hhrtim,
-                                 HRTIM_OUTPUT_TA1 | HRTIM_OUTPUT_TA2 |
-                                 HRTIM_OUTPUT_TB1 | HRTIM_OUTPUT_TB2 |
-                                 HRTIM_OUTPUT_TC1 | HRTIM_OUTPUT_TC2  );
+		  HRTIM_OUTPUT_TA1 | HRTIM_OUTPUT_TA2 |
+		  HRTIM_OUTPUT_TB1 | HRTIM_OUTPUT_TB2 |
+		  HRTIM_OUTPUT_TC1 | HRTIM_OUTPUT_TC2  );
+  if( ret != HAL_OK)
+  {
+	  Error_Handler();
+  }
 
   ret = HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C | HRTIM_TIMERID_MASTER );
   //HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_MASTER );
-
+  if( ret != HAL_OK)
+  {
+	  Error_Handler();
+  }
 
 
   LL_SYSTICK_EnableIT();
@@ -225,7 +236,7 @@ static void MX_HRTIM_Init(void)
     Error_Handler();
   }
   pTimerCfg.InterruptRequests = HRTIM_MASTER_IT_NONE;
-  pTimerCfg.DMARequests = HRTIM_MASTER_DMA_MCMP1;
+  pTimerCfg.DMARequests = HRTIM_MASTER_DMA_MREP;
   pTimerCfg.DMASrcAddress = 0x0000;
   pTimerCfg.DMADstAddress = 0x0000;
   pTimerCfg.DMASize = 0x1;
@@ -236,7 +247,7 @@ static void MX_HRTIM_Init(void)
   pTimerCfg.PreloadEnable = HRTIM_PRELOAD_ENABLED;
   pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_DMABURST;
   pTimerCfg.BurstMode = HRTIM_TIMERBURSTMODE_MAINTAINCLOCK;
-  pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_DISABLED;
+  pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_ENABLED;
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_MASTER, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
@@ -259,6 +270,7 @@ static void MX_HRTIM_Init(void)
   pTimerCfg.DMARequests = HRTIM_TIM_DMA_NONE;
   pTimerCfg.PreloadEnable = HRTIM_PRELOAD_DISABLED;
   pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_INDEPENDENT;
+  pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_DISABLED;
   pTimerCfg.PushPull = HRTIM_TIMPUSHPULLMODE_DISABLED;
   pTimerCfg.FaultEnable = HRTIM_TIMFAULTENABLE_NONE;
   pTimerCfg.FaultLock = HRTIM_TIMFAULTLOCK_READWRITE;

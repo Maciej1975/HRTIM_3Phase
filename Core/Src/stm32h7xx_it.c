@@ -194,20 +194,20 @@ void SysTick_Handler(void)
 	{
 		// TIMER_A is updated directly at the moment, because it works! - ref for oscilloscope
 		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP1xR =  m_period_middle_ticks - count - 200;
-		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP2xR =  m_period_middle_ticks + count + 200;
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_A].CMP2xR =  m_period_middle_ticks + count + 100;
 
 		// TIMER_x should NOT be updated directly
-		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP1xR =  m_period_middle_ticks - count;
-		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP2xR =  m_period_middle_ticks + count;
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP1xR =  m_period_middle_ticks - count - 200;
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_B].CMP2xR =  m_period_middle_ticks + count + 200;
 
 		// TIMER_x should NOT be updated directly
-		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP1xR =  m_period_middle_ticks - count;
-		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP2xR =  m_period_middle_ticks + count;
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP1xR =  m_period_middle_ticks - count - 200;
+		hhrtim.Instance->sTimerxRegs[HRTIM_TIMERINDEX_TIMER_C].CMP2xR =  m_period_middle_ticks + count + 200;
 
 		// TIMER_C should be updated over DMA
 
-		count++;
-		if( count > 200 )
+		count += 10; // watch it with oscilloscope
+		if( count > 800 )
 		{
 			count = 0;
 		}
@@ -215,12 +215,21 @@ void SysTick_Handler(void)
 
 	if(uwTick % 500 == 0)
 	{
-		// TIMER_C should be updated over DMA
-		HAL_StatusTypeDef volatile ret =
-				HAL_HRTIM_BurstDMATransfer( &hhrtim, HRTIM_TIMERINDEX_MASTER, (uint32_t)dma_buffr, 1 );
-		uint32_t tmp = dma_buffr[0];
-		dma_buffr[0] = dma_buffr[1];
-		dma_buffr[1] = tmp;
+		static uint16_t do_it = 1; // chnge the value with debugger
+
+		if( do_it )
+		{
+			// TIMER_C should be updated over DMA
+			HAL_StatusTypeDef volatile ret =
+					HAL_HRTIM_BurstDMATransfer( &hhrtim, HRTIM_TIMERINDEX_MASTER, (uint32_t)dma_buffr, 1 );
+			if( ret != HAL_OK)
+			{
+				Error_Handler();
+			}
+			uint32_t tmp = dma_buffr[0];
+			dma_buffr[0] = dma_buffr[1];
+			dma_buffr[1] = tmp;
+		}
 	}
 
 

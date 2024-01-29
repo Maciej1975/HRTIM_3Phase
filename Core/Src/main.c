@@ -112,7 +112,7 @@ int main(void)
 	  Error_Handler();
   }
 
-  ret = HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C );
+  ret = HAL_HRTIM_WaveformCountStart( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C );
   if( ret != HAL_OK)
   {
 	  Error_Handler();

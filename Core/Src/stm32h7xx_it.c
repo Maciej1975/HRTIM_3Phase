@@ -226,9 +226,9 @@ void SysTick_Handler(void)
 			{
 				Error_Handler();
 			}
-			uint32_t tmp = dma_buffr[0];
-			dma_buffr[0] = dma_buffr[1];
-			dma_buffr[1] = tmp;
+//			uint32_t tmp = dma_buffr[0];
+//			dma_buffr[0] = dma_buffr[1];
+//			dma_buffr[1] = tmp;
 		}
 	}
 

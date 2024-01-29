@@ -112,13 +112,16 @@ int main(void)
 	  Error_Handler();
   }
 
-  ret = HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C | HRTIM_TIMERID_MASTER );
-  //HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_MASTER );
+  ret = HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C );
   if( ret != HAL_OK)
   {
 	  Error_Handler();
   }
-
+  ret = HAL_HRTIM_WaveformCountStart_DMA( &hhrtim, HRTIM_TIMERID_MASTER );
+  if( ret != HAL_OK)
+  {
+	  Error_Handler();
+  }
 
   LL_SYSTICK_EnableIT();
 
@@ -268,8 +271,6 @@ static void MX_HRTIM_Init(void)
   }
   pTimerCfg.InterruptRequests = HRTIM_TIM_IT_NONE;
   pTimerCfg.DMARequests = HRTIM_TIM_DMA_NONE;
-  pTimerCfg.PreloadEnable = HRTIM_PRELOAD_DISABLED;
-  pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_INDEPENDENT;
   pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_DISABLED;
   pTimerCfg.PushPull = HRTIM_TIMPUSHPULLMODE_DISABLED;
   pTimerCfg.FaultEnable = HRTIM_TIMFAULTENABLE_NONE;
@@ -279,11 +280,11 @@ static void MX_HRTIM_Init(void)
   pTimerCfg.UpdateTrigger = HRTIM_TIMUPDATETRIGGER_MASTER;
   pTimerCfg.ResetTrigger = HRTIM_TIMRESETTRIGGER_MASTER_PER;
   pTimerCfg.ResetUpdate = HRTIM_TIMUPDATEONRESET_DISABLED;
+  pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_DMABURST_UPDATE; // HERE
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_A, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
   }
-  pTimerCfg.PreloadEnable = HRTIM_PRELOAD_ENABLED;
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_B, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();

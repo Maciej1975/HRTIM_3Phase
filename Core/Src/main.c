@@ -268,7 +268,12 @@ static void MX_HRTIM_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_HRTIM_BurstDMAConfig(&hhrtim, HRTIM_TIMERINDEX_MASTER, HRTIM_BURSTDMA_CMP1) != HAL_OK)
+  pCompareCfg.CompareValue = 666;
+  if (HAL_HRTIM_WaveformCompareConfig(&hhrtim, HRTIM_TIMERINDEX_MASTER, HRTIM_COMPAREUNIT_2, &pCompareCfg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_HRTIM_BurstDMAConfig(&hhrtim, HRTIM_TIMERINDEX_MASTER, HRTIM_BURSTDMA_CMP2) != HAL_OK)
   {
     Error_Handler();
   }

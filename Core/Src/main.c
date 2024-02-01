@@ -215,6 +215,7 @@ static void MX_HRTIM_Init(void)
 
   /* USER CODE END HRTIM_Init 0 */
 
+  HRTIM_ADCTriggerCfgTypeDef pADCTriggerCfg = {0};
   HRTIM_TimeBaseCfgTypeDef pTimeBaseCfg = {0};
   HRTIM_TimerCfgTypeDef pTimerCfg = {0};
   HRTIM_CompareCfgTypeDef pCompareCfg = {0};
@@ -227,6 +228,12 @@ static void MX_HRTIM_Init(void)
   hhrtim.Init.HRTIMInterruptResquests = HRTIM_IT_NONE;
   hhrtim.Init.SyncOptions = HRTIM_SYNCOPTION_NONE;
   if (HAL_HRTIM_Init(&hhrtim) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  pADCTriggerCfg.UpdateSource = HRTIM_ADCTRIGGERUPDATE_MASTER;
+  pADCTriggerCfg.Trigger = HRTIM_ADCTRIGGEREVENT13_MASTER_CMP1;
+  if (HAL_HRTIM_ADCTriggerConfig(&hhrtim, HRTIM_ADCTRIGGER_1, &pADCTriggerCfg) != HAL_OK)
   {
     Error_Handler();
   }

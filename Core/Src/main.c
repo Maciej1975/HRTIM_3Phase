@@ -99,6 +99,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
+  HAL_ADC_Start_IT( &hadc1 );
+
+
   HAL_StatusTypeDef volatile ret =
 		  HAL_HRTIM_SoftwareReset( &hhrtim, HRTIM_TIMERRESET_MASTER ); // MASTER should reset its slaves
   if( ret != HAL_OK)
@@ -115,7 +118,13 @@ int main(void)
 	  Error_Handler();
   }
 
-  ret = HAL_HRTIM_WaveformCountStart( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C );
+  ret = HAL_HRTIM_WaveformCountStart( &hhrtim, HRTIM_TIMERID_TIMER_A | HRTIM_TIMERID_TIMER_B | HRTIM_TIMERID_TIMER_C  );
+  if( ret != HAL_OK)
+  {
+	  Error_Handler();
+  }
+  // Interrupts for testing purpose
+  ret = HAL_HRTIM_WaveformCountStart_IT( &hhrtim, HRTIM_TIMERID_TIMER_D | HRTIM_TIMERID_TIMER_E );
   if( ret != HAL_OK)
   {
 	  Error_Handler();
@@ -232,7 +241,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_14B;
   hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.NbrOfConversion = 1;
@@ -264,7 +273,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_2;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_32CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
@@ -331,15 +340,21 @@ static void MX_HRTIM_Init(void)
 
   /* USER CODE END HRTIM_Init 1 */
   hhrtim.Instance = HRTIM1;
-  hhrtim.Init.HRTIMInterruptResquests = HRTIM_IT_NONE;
+  hhrtim.Init.HRTIMInterruptResquests = HRTIM_IT_SYSFLT;
   hhrtim.Init.SyncOptions = HRTIM_SYNCOPTION_NONE;
   if (HAL_HRTIM_Init(&hhrtim) != HAL_OK)
   {
     Error_Handler();
   }
-  pADCTriggerCfg.UpdateSource = HRTIM_ADCTRIGGERUPDATE_MASTER;
-  pADCTriggerCfg.Trigger = HRTIM_ADCTRIGGEREVENT13_MASTER_CMP1;
+  pADCTriggerCfg.UpdateSource = HRTIM_ADCTRIGGERUPDATE_TIMER_D;
+  pADCTriggerCfg.Trigger = HRTIM_ADCTRIGGEREVENT13_TIMERD_CMP2;
   if (HAL_HRTIM_ADCTriggerConfig(&hhrtim, HRTIM_ADCTRIGGER_1, &pADCTriggerCfg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  pADCTriggerCfg.UpdateSource = HRTIM_ADCTRIGGERUPDATE_TIMER_E;
+  pADCTriggerCfg.Trigger = HRTIM_ADCTRIGGEREVENT24_TIMERE_CMP2;
+  if (HAL_HRTIM_ADCTriggerConfig(&hhrtim, HRTIM_ADCTRIGGER_2, &pADCTriggerCfg) != HAL_OK)
   {
     Error_Handler();
   }
@@ -398,11 +413,11 @@ static void MX_HRTIM_Init(void)
   pTimerCfg.UpdateTrigger = HRTIM_TIMUPDATETRIGGER_MASTER;
   pTimerCfg.ResetTrigger = HRTIM_TIMRESETTRIGGER_MASTER_PER;
   pTimerCfg.ResetUpdate = HRTIM_TIMUPDATEONRESET_DISABLED;
+  pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_DMABURST_UPDATE; // HERE
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_A, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
   }
-  pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_INDEPENDENT;
   if (HAL_HRTIM_WaveformTimerConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_B, &pTimerCfg) != HAL_OK)
   {
     Error_Handler();
@@ -411,7 +426,9 @@ static void MX_HRTIM_Init(void)
   {
     Error_Handler();
   }
-  pTimerCfg.InterruptRequests = HRTIM_TIM_IT_CMP1;
+  pTimerCfg.InterruptRequests = HRTIM_TIM_IT_CMP2;
+  pTimerCfg.PreloadEnable = HRTIM_PRELOAD_DISABLED;
+  pTimerCfg.UpdateGating = HRTIM_UPDATEGATING_INDEPENDENT;
   pTimerCfg.RepetitionUpdate = HRTIM_UPDATEONREPETITION_ENABLED;
   pTimerCfg.DeadTimeInsertion = HRTIM_TIMDEADTIMEINSERTION_DISABLED;
   pTimerCfg.DelayedProtectionMode = HRTIM_TIMER_D_E_DELAYEDPROTECTION_DISABLED;
@@ -444,6 +461,18 @@ static void MX_HRTIM_Init(void)
   }
 
   if (HAL_HRTIM_WaveformCompareConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_C, HRTIM_COMPAREUNIT_2, &pCompareCfg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  pCompareCfg.CompareValue = PWM_Period;
+
+  if (HAL_HRTIM_WaveformCompareConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_D, HRTIM_COMPAREUNIT_2, &pCompareCfg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  pCompareCfg.CompareValue = Base_Period - 2000;
+
+  if (HAL_HRTIM_WaveformCompareConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_E, HRTIM_COMPAREUNIT_2, &pCompareCfg) != HAL_OK)
   {
     Error_Handler();
   }
@@ -522,21 +551,12 @@ static void MX_HRTIM_Init(void)
     Error_Handler();
   }
   pTimeBaseCfg.Period = Base_Period;
+  pTimeBaseCfg.Mode = HRTIM_MODE_SINGLESHOT;
   if (HAL_HRTIM_TimeBaseConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_D, &pTimeBaseCfg) != HAL_OK)
   {
     Error_Handler();
   }
-  pCompareCfg.CompareValue = Base_Period - 100;
-  if (HAL_HRTIM_WaveformCompareConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_D, HRTIM_COMPAREUNIT_1, &pCompareCfg) != HAL_OK)
-  {
-    Error_Handler();
-  }
   if (HAL_HRTIM_TimeBaseConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_E, &pTimeBaseCfg) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  pCompareCfg.CompareValue = Base_Period - 200;
-  if (HAL_HRTIM_WaveformCompareConfig(&hhrtim, HRTIM_TIMERINDEX_TIMER_E, HRTIM_COMPAREUNIT_1, &pCompareCfg) != HAL_OK)
   {
     Error_Handler();
   }

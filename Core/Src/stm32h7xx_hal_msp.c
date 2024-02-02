@@ -241,6 +241,11 @@ void HAL_HRTIM_MspInit(HRTIM_HandleTypeDef* hhrtim)
 
     __HAL_LINKDMA(hhrtim,hdmaMaster,hdma_hrtim1_m);
 
+    /* HRTIM1 interrupt Init */
+    HAL_NVIC_SetPriority(HRTIM1_TIMD_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(HRTIM1_TIMD_IRQn);
+    HAL_NVIC_SetPriority(HRTIM1_TIME_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(HRTIM1_TIME_IRQn);
   /* USER CODE BEGIN HRTIM1_MspInit 1 */
 
   /* USER CODE END HRTIM1_MspInit 1 */
@@ -305,6 +310,10 @@ void HAL_HRTIM_MspDeInit(HRTIM_HandleTypeDef* hhrtim)
 
     /* HRTIM1 DMA DeInit */
     HAL_DMA_DeInit(hhrtim->hdmaMaster);
+
+    /* HRTIM1 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(HRTIM1_TIMD_IRQn);
+    HAL_NVIC_DisableIRQ(HRTIM1_TIME_IRQn);
   /* USER CODE BEGIN HRTIM1_MspDeInit 1 */
 
   /* USER CODE END HRTIM1_MspDeInit 1 */

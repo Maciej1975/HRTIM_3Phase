@@ -57,6 +57,7 @@
 /* External variables --------------------------------------------------------*/
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_hrtim1_m;
+extern HRTIM_HandleTypeDef hhrtim;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -294,6 +295,49 @@ void DMAMUX1_OVR_IRQHandler(void)
   /* USER CODE END DMAMUX1_OVR_IRQn 1 */
 }
 
+/**
+  * @brief This function handles HRTIM timer D global interrupt.
+  */
+void HRTIM1_TIMD_IRQHandler(void)
+{
+  /* USER CODE BEGIN HRTIM1_TIMD_IRQn 0 */
+
+  /* USER CODE END HRTIM1_TIMD_IRQn 0 */
+  HAL_HRTIM_IRQHandler(&hhrtim,HRTIM_TIMERINDEX_TIMER_D);
+  /* USER CODE BEGIN HRTIM1_TIMD_IRQn 1 */
+
+  /* USER CODE END HRTIM1_TIMD_IRQn 1 */
+}
+
+/**
+  * @brief This function handles HRTIM timer E global interrupt.
+  */
+void HRTIM1_TIME_IRQHandler(void)
+{
+  /* USER CODE BEGIN HRTIM1_TIME_IRQn 0 */
+
+  /* USER CODE END HRTIM1_TIME_IRQn 0 */
+  HAL_HRTIM_IRQHandler(&hhrtim,HRTIM_TIMERINDEX_TIMER_E);
+  /* USER CODE BEGIN HRTIM1_TIME_IRQn 1 */
+
+  /* USER CODE END HRTIM1_TIME_IRQn 1 */
+}
+
 /* USER CODE BEGIN 1 */
+
+
+void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(hadc);
+  //set the breakpoint here
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(hadc);
+  //set the breakpoint
+}
 
 /* USER CODE END 1 */

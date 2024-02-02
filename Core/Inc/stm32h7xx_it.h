@@ -58,6 +58,8 @@ void SysTick_Handler(void);
 void DMA1_Stream2_IRQHandler(void);
 void ADC_IRQHandler(void);
 void DMAMUX1_OVR_IRQHandler(void);
+void HRTIM1_TIMD_IRQHandler(void);
+void HRTIM1_TIME_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

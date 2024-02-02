@@ -60,6 +60,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Base_Period 12000
+#define PWM_Period 6000
+#define TP_111_Pin GPIO_PIN_6
+#define TP_111_GPIO_Port GPIOA
+#define M_Supply_Pin GPIO_PIN_1
+#define M_Supply_GPIO_Port GPIOB
+#define U_current_Pin GPIO_PIN_11
+#define U_current_GPIO_Port GPIOF
 
 /* USER CODE BEGIN Private defines */
 
